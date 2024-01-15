@@ -1,0 +1,61 @@
+{% extends "layout.html" %}
+
+{% block head %}
+    <title>Home</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css')}}"/>
+{% endblock %}
+
+{% block content %}
+<body>
+    <div class="container-fluid h-100">
+        <div class="row justify-content-center align-items-center h-100">
+            <div class="col-md-6 col-xl-4 chat">
+                <div class="card">
+                    <div class="card-header msg_head">
+                        <div class="d-flex bd-highlight">
+                            <div class="user_info">
+                                <span>Welcome</span>
+                                {% if username is not none %}
+                                    <p>Logged in as {{ session['username'] }}</p>
+                                {% else %}
+                                    <p>Please login or register</p>
+                                {% endif %}
+                            </div>                            
+                        </div>                        
+                    </div>
+                    <div class="card-body msg_card_body text-center">
+                        <p class="justify-text">Hello everyone, welcome to my custom GPT application. If you want to be granted access please send an e-mail to coenjsonneveld@gmail.com. If you already have an account please do log in and enjoy everything that is available! Please take note: Username and password are case-sensitive</p>
+                        {% if username is none %}
+                            <form action="/login" method="post">
+                                <div class="form-group">
+                                    <label for="username">Username</label>
+                                    <input type="text" class="form-control" id="username" name="username" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="password">Password</label>
+                                    <input type="password" class="form-control" id="password" name="password" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Login</button>
+                            </form>
+                            <p></p>
+                            {% with messages = get_flashed_messages() %}
+                                {% if messages %}
+                                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                                        <strong class="font-bold">Error! </strong>
+                                        <span class="block sm:inline">{{ messages[0] }}</span>
+                                    </div>
+                                {% endif %}
+                            {% endwith %}
+                        {% else %}
+                            <hr>
+                            <a href="/logout" class="btn btn-primary">Logout</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+{% endblock %}

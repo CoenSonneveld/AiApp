@@ -1,0 +1,55 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Chatbot
+{% endblock %}
+
+{% block head %}
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css')}}"/>
+{% endblock %}
+
+{% block content %}
+<body>
+    <h2 style="display: flex; justify-content: center;">Instructions</h2>
+    <p></p>
+    <div style="display: flex; justify-content: center;">
+    <p style="width: 70ch; text-align: center;">Hello, {{ username }}!
+    Welcome to the Custom GPT builder. To get started please first Upload your knowledge base. After that you 
+    need to set a bot name and instructions for the bot. After that you can start chatting with your bot. Please 
+    take note that when adding documents or instructions it might take a few seconds for the bot to update.
+    </p>
+    </div>
+    <p></p>
+    <div class="container-fluid h-100">
+        <div class="row justify-content-center align-items-center">
+            <!-- Chat box -->
+            <div class="col-md-10 col-xl-8 chat">
+                <div class="card">
+                    <div class="card-header msg_head">
+                        <div class="d-flex bd-highlight">
+                            <div class="img_cont">
+                                <img src="https://i.ibb.co/fSNP7Rz/icons8-chatgpt-512.png" class="rounded-circle user_img">
+                                <span class="online_icon"></span>
+                            </div>
+                            <div class="user_info">
+                                <span id="chatbotName">Click me to give me a name!</span>
+                                <p>Ask me anything!</p>
+                            </div>
+                        </div>
+                    </div>
+                    <pre class="card-body msg_card_body" id="chatBox"></pre>
+                    <div class="card-footer">
+                        <form id="messageArea2" class="input-group">
+                            <input type="text" id="text2" name="msg" placeholder="Type your message..." autocomplete="off" class="form-control type_msg" required/>
+                            <div class="input-group-append">
+                                <button type="submit" id="send" class="input-group-text send_btn"><i class="fas fa-location-arrow"></i></button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="static/chatgpt.js"></script>
+</body>
+{% endblock %} 

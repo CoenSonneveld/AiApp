@@ -1,0 +1,12 @@
+boto3
+botocore
+flask
+flask-cors
+flask-login
+flask-migrate
+flask-session
+flask-sqlalchemy
+openai
+packaging
+python-dotenv
+werkzeug
