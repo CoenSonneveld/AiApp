@@ -80,6 +80,10 @@ function sendMessageToServer(userInput) {
     $("#messageFormeight").append(userHtml);
     $("#text").val('');
 
+    // Append a temporary "Processing..." message
+    var processingHtml = createMessageHtml("Processing...", "assistant");
+    var processingMessage = $(processingHtml).appendTo("#messageFormeight");
+
     $.ajax({
         url: '/chat',
         type: 'POST',
@@ -87,12 +91,20 @@ function sendMessageToServer(userInput) {
         data: JSON.stringify({thread_id: threadId, message: userInput}),
         dataType: 'json',
         success: function(data) {
+            // Remove the temporary "Processing..." message
+            processingMessage.remove();
+
             var formattedResponse = formatResponse(data.response);
             var responseHtml = createMessageHtml(formattedResponse, "assistant");
             $("#messageFormeight").append(responseHtml);
             scrollToBottom();
         },
-        error: handleAjaxError
+        error: function(jqXHR) {
+            // Remove the temporary "Processing..." message
+            processingMessage.remove();
+
+            handleAjaxError(jqXHR);
+        }
     });
 }
 
