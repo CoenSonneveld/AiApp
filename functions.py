@@ -9,6 +9,7 @@ import boto3
 from botocore.exceptions import NoCredentialsError
 import openai
 from models import User, db
+import time
 
 def create_new_assistant(client, files, s3, bucket_name, instructions, username, botName):
     try:
@@ -26,16 +27,20 @@ def create_new_assistant(client, files, s3, bucket_name, instructions, username,
             os.remove(local_filename)  # Delete the file after uploading it to OpenAI
             print("File IDs:", file_ids)
 
+        start_time = time.time()
         assistant = client.beta.assistants.create(
             name=botName,
             instructions=instructions,
-            model="gpt-4-1106-preview",
+            model="gpt-3.5-turbo-1106",
             tools=[{
                 "type": "retrieval"
             }],
             file_ids=file_ids)  # Pass the entire list of file IDs
+        print("Time taken to create assistant: ", time.time() - start_time)
 
+        start_time = time.time()
         thread = client.beta.threads.create()
+        print("Time taken to create thread: ", time.time() - start_time)
         print(f"New thread created with ID: {thread.id}")  # Debugging line
 
         # Get the user from the database
