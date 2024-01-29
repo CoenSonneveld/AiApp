@@ -10,3 +10,6 @@ openai
 packaging
 python-dotenv
 werkzeug
+streamlit
+pytube
+requests

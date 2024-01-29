@@ -230,7 +230,8 @@ function populateKnowledgeFiles(data) {
 
 function appendChatHistory(chatHistory) {
     chatHistory.forEach(function(message) {
-        var messageHtml = createMessageHtml(message.content, message.role);
+        var formattedMessage = formatResponse(message.content);
+        var messageHtml = createMessageHtml(formattedMessage, message.role);
         $("#messageFormeight").append(messageHtml);
     });
     scrollToBottom();
