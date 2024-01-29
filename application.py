@@ -474,12 +474,38 @@ def get_knowledge():
         return jsonify({"error": "An error occurred while retrieving the files: " + str(e)}), 500
 
 @app.route('/knowledge/<username>/<filename>', methods=['DELETE'])
+@login_required
 def delete_file(username, filename):
     try:
         delete_file_from_bucket(username, filename)
-        return '', 204
     except Exception as e:
         return jsonify({"error": "An error occurred while deleting the file: " + str(e)}), 500
+
+    # Get the user from the database
+    user = User.query.filter_by(username=username).first()
+    if user is None:
+        return jsonify({"error": "User not found"}), 404
+
+    instructions = user.instructions
+    botName = user.botName
+
+    # Delete the previous assistant
+    if user.assistant_id:
+        try:
+            client.beta.assistants.delete(assistant_id=user.assistant_id)
+            print("Deleted old assistant.")
+        except Exception as e:
+            print(f"Failed to delete the assistant. Error: {str(e)}")
+
+    # Reinitialize the assistant
+    try:
+        assistant_id = create_assistant(client, instructions, username, botName)
+        user.assistant_id = assistant_id  # Update the assistant ID in the database
+        db.session.commit()
+    except Exception as e:
+        return jsonify({"error": "An error occurred while reinitializing the assistant: " + str(e)}), 500
+
+    return jsonify({"message": "File deleted and assistant reinitialized successfully"}), 200
 
 @app.route('/knowledge', methods=['POST'])
 @login_required

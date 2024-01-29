@@ -51,7 +51,7 @@ function loadChatHistory() {
 }
 
 function sendStartMessage() {
-    var startMessage = "Hello, how can I assist you today?";
+    var startMessage = "Hello, how can I assist you today? type: /help for instructions, /clear to clear chat history";
     var startHtml = createMessageHtml(startMessage, "assistant");
     $("#messageFormeight").append(startHtml);
 }
@@ -80,32 +80,39 @@ function sendMessageToServer(userInput) {
     $("#messageFormeight").append(userHtml);
     $("#text").val('');
 
-    // Append a temporary "Processing..." message
-    var processingHtml = createMessageHtml("Processing...", "assistant");
-    var processingMessage = $(processingHtml).appendTo("#messageFormeight");
+    if (userInput.toLowerCase() === '/help') {
+        var helpMessage = "Welcome to the Custom GPT Builder. Begin by uploading your knowledge base. Then, specify a name for your bot and provide its instructions in the forms below. Once completed, you can initiate a conversation with your bot. Please be aware that the bot may take a few seconds to update after adding documents or instructions.";
+        var helpHtml = createMessageHtml(helpMessage, "assistant");
+        $("#messageFormeight").append(helpHtml);
+        scrollToBottom();
+    } else {
+        // Append a temporary "Processing..." message
+        var processingHtml = createMessageHtml("Processing...", "assistant");
+        var processingMessage = $(processingHtml).appendTo("#messageFormeight");
 
-    $.ajax({
-        url: '/chat',
-        type: 'POST',
-        contentType: 'application/json',
-        data: JSON.stringify({thread_id: threadId, message: userInput}),
-        dataType: 'json',
-        success: function(data) {
-            // Remove the temporary "Processing..." message
-            processingMessage.remove();
+        $.ajax({
+            url: '/chat',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({thread_id: threadId, message: userInput}),
+            dataType: 'json',
+            success: function(data) {
+                // Remove the temporary "Processing..." message
+                processingMessage.remove();
 
-            var formattedResponse = formatResponse(data.response);
-            var responseHtml = createMessageHtml(formattedResponse, "assistant");
-            $("#messageFormeight").append(responseHtml);
-            scrollToBottom();
-        },
-        error: function(jqXHR) {
-            // Remove the temporary "Processing..." message
-            processingMessage.remove();
+                var formattedResponse = formatResponse(data.response);
+                var responseHtml = createMessageHtml(formattedResponse, "assistant");
+                $("#messageFormeight").append(responseHtml);
+                scrollToBottom();
+            },
+            error: function(jqXHR) {
+                // Remove the temporary "Processing..." message
+                processingMessage.remove();
 
-            handleAjaxError(jqXHR);
-        }
-    });
+                handleAjaxError(jqXHR);
+            }
+        });
+    }
 }
 
 function formatResponse(response) {
@@ -132,12 +139,23 @@ function createMessageHtml(message, role) {
 function handleDeleteFile() {
     var filename = $(this).data('filename');
     var username = $(this).data('username');
+    var fileElement = $(this).parent();
+
+    // Append a "Processing..." message to the knowledge box
+    var processingMessage = $("<p>Processing...</p>").appendTo("#knowledge");
 
     $.ajax({
         url: '/knowledge/' + username + '/' + filename,
         type: 'DELETE',
         success: function() {
-            $(this).parent().remove();
+            // Remove the "Processing..." message
+            processingMessage.remove();
+
+            fileElement.remove();
+        },
+        error: function() {
+            // Remove the "Processing..." message
+            processingMessage.remove();
         }
     });
 }
@@ -177,6 +195,10 @@ function uploadFiles(files) {
             return;
         }
     }
+
+    // Append a "Processing..." message to the knowledge box
+    var processingMessage = $("<p>Processing...</p>").appendTo("#knowledge");
+
     $.ajax({
         url: '/knowledge',
         type: 'POST',
@@ -184,7 +206,14 @@ function uploadFiles(files) {
         processData: false,
         contentType: false,
         success: function() {
+            // Remove the "Processing..." message
+            processingMessage.remove();
+
             appendFilesToSidebar(files);
+        },
+        error: function() {
+            // Remove the "Processing..." message
+            processingMessage.remove();
         }
     });
 }
